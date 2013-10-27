@@ -3,6 +3,9 @@
 
 'use strict';
 
+/*global Utils, ActivityHandler, ThreadUI, ThreadListUI, MessageManager,
+         Settings, LazyLoader */
+
 var lazyLoadFiles = [
   'shared/js/async_storage.js',
   'shared/js/l10n_date.js',
@@ -95,7 +98,10 @@ window.addEventListener('load', function() {
   navigator.mozL10n.ready(function waitLocalizedForLoading() {
     LazyLoader.load(lazyLoadFiles, function() {
       if (!navigator.mozMobileMessage) {
-        var mocks = ['js/desktop_sms_mock.js', 'js/desktop_contacts_mock.js'];
+        var mocks = [
+          'js/desktop-only/mobilemessage.js',
+          'js/desktop-only/contacts.js'
+        ];
         LazyLoader.load(mocks, function() {
           MessageManager.init(initUIApp);
         });

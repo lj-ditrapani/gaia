@@ -149,7 +149,7 @@ function SimContactsImporter() {
           var aTel = item.tel[j];
           // Filtering out empty values
           if (aTel.value && aTel.value.trim()) {
-            aTel.type = 'mobile';
+            aTel.type = ['mobile'];
             telItems.push(aTel);
           }
         }
@@ -157,6 +157,8 @@ function SimContactsImporter() {
       }
 
       item.category = ['sim'];
+
+      var contact = new mozContact(item);
 
       var cbs = {
         onmatch: function(results) {
@@ -169,10 +171,10 @@ function SimContactsImporter() {
           };
 
           contacts.adaptAndMerge(this, results, mergeCbs);
-        }.bind(item),
+        }.bind(contact),
         onmismatch: function() {
           saveContact(this);
-        }.bind(item)
+        }.bind(contact)
       };
 
       contacts.Matcher.match(item, 'passive', cbs);
@@ -180,8 +182,8 @@ function SimContactsImporter() {
   } // importSlice
 
 
-  function saveContact(item) {
-    var req = window.navigator.mozContacts.save(item);
+  function saveContact(contact) {
+    var req = window.navigator.mozContacts.save(contact);
       req.onsuccess = function saveSuccess() {
         continueCb();
       };

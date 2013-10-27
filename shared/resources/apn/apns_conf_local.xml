@@ -4,23 +4,11 @@
 <!-- This version must agree with that in apps/common/res/apns.xml -->
 <apns version="7">
 
-  <!-- Test Networks -->
+  <!-- Test Network -->
   <apn carrier="Test Network"
       mcc="001"
       mnc="01"
       apn="internet"
-      user="user"
-      password="password"
-      proxy="127.0.0.1"
-      port="8080"
-      authtype="0"
-      type="default,supl"
-  />
-  
-  <apn carrier="Test Network with MMS"
-      mcc="001"
-      mnc="02"
-      apn="mms.internet"
       user="user"
       password="password"
       proxy="127.0.0.1"
@@ -30,30 +18,6 @@
       mmsport="8080"
       authtype="0"
       type="default,supl,mms"
-  />
-
-  <apn carrier="Test Network with Operator Variant Settings"
-      mcc="001"
-      mnc="03"
-      apn="mms.internet"
-      user="user"
-      password="password"
-      proxy="127.0.0.1"
-      port="8080"
-      authtype="0"
-      type="default,supl"
-  />
-
-    <apn carrier="Test Network with SUPL"
-      mcc="001"
-      mnc="04"
-      apn="supl.internet"
-      user="user"
-      password="password"
-      proxy="127.0.0.1"
-      port="8080"
-      authtype="0"
-      type="default,supl"
   />
   <!-- /Test Networks -->
 
@@ -284,7 +248,7 @@
       mmsproxy="210.200.66.196"
       mmsport="80"
       user="aptwap@nsip.qma.com.tw"
-      passowrd="aptwap"
+      password="aptwap"
       authtype="2"
       type="default"
   />
@@ -296,7 +260,7 @@
       mmsproxy="210.200.66.196"
       mmsport="80"
       user="aptwap@nsip.qma.com.tw"
-      passowrd="aptwap"
+      password="aptwap"
       authtype="2"
       type="default"
   />
@@ -309,7 +273,7 @@
       mmsproxy="210.200.66.196"
       mmsport="80"
       user="aptwap@nsip.qma.com.tw"
-      passowrd="aptwap"
+      password="aptwap"
       type="mms"
   />
 </apns>

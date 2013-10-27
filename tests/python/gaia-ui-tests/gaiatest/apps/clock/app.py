@@ -98,12 +98,6 @@ class Clock(Base):
         def tap_checkbox(self):
             self.root_element.find_element(*self._enable_button_locator).tap()
 
-        def wait_for_alarm_to_uncheck(self):
-            self.wait_for_condition(lambda m: self.root_element.find_element(*self._check_box_locator).is_selected() == False)
-
-        def wait_for_alarm_to_check(self):
-            self.wait_for_condition(lambda m: self.root_element.find_element(*self._check_box_locator).is_selected() == True)
-
         def tap(self):
             self.wait_for_element_displayed(*self._tap_locator)
             self.root_element.find_element(*self._tap_locator).tap()

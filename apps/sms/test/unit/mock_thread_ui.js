@@ -1,3 +1,6 @@
+/*global Recipients, Template */
+/*exported MockThreadUI */
+
 'use strict';
 
 var MockThreadUI = {
@@ -18,6 +21,8 @@ var MockThreadUI = {
     });
   },
   initSentAudio: function() {},
+  enableActivityRequestMode: function() {},
+  resetActivityRequestMode: function() {},
   getAllInputs: function() {},
   getSelectedInputs: function() {},
   setMessageBody: function() {},

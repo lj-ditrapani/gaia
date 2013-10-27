@@ -172,8 +172,8 @@ var CardsView = (function() {
       cardsView.addEventListener('mousedown', CardsView);
     }
 
-    // Make sure we're in portrait mode
-    screen.mozLockOrientation('portrait-primary');
+    // Make sure we're in default orientation
+    screen.mozLockOrientation(ScreenLayout.defaultOrientation);
 
     // If there is a displayed app, take keyboard focus away
     if (displayedApp)
@@ -598,8 +598,10 @@ var CardsView = (function() {
   function onMoveEventForDeleting(evt, deltaY) {
     var dy = deltaY | initialTouchPosition[1] -
                               (evt.touches ? evt.touches[0].pageY : evt.pageY);
-    evt.target.style.MozTransform = 'scale(' + CC_SCALE +
-                                                  ') translateY(-' + dy + 'px)';
+    if (dy > 0) {
+       evt.target.style.MozTransform = 'scale(' + CC_SCALE +
+                                               ') translateY(' + (-dy) + 'px)';
+    }
   }
 
   function onStartEvent(evt) {

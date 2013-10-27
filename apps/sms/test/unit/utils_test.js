@@ -1,9 +1,13 @@
+/*global MocksHelper, MockL10n, Utils, MockContact, FixturePhones,
+         MockFixedHeader, MockContacts, MockMozPhoneNumberService */
+
 'use strict';
 
 requireApp('sms/test/unit/mock_fixed_header.js');
 requireApp('sms/test/unit/mock_contact.js');
 requireApp('sms/test/unit/mock_contacts.js');
 requireApp('sms/test/unit/mock_l10n.js');
+requireApp('sms/test/unit/mock_navigator_mozphonenumberservice.js');
 requireApp('sms/js/utils.js');
 
 var mocksHelperForUtils = new MocksHelper([
@@ -12,6 +16,7 @@ var mocksHelperForUtils = new MocksHelper([
 
 suite('Utils', function() {
   var nativeMozL10n = navigator.mozL10n;
+  var nmpns = navigator.mozPhoneNumberService;
 
   mocksHelperForUtils.attachTestHelpers();
 
@@ -187,7 +192,6 @@ suite('Utils', function() {
     test('timeout on minute boundary', function() {
       // "Fri Jul 12 2013 16:01:54 GMT-0400 (EDT)"
       var start = 1373659314572;
-      var callTimes = [];
 
       this.sinon.clock.tick(start);
       Utils.startTimeHeaderScheduler();
@@ -237,8 +241,6 @@ suite('Utils', function() {
     });
 
     test('(number, null)', function() {
-      var contact = new MockContact();
-
       var details = Utils.getContactDetails('346578888888', null);
       assert.deepEqual(details, {
         title: ''
@@ -260,7 +262,6 @@ suite('Utils', function() {
 
     test('(number, contact (blank information))', function() {
       var contact = new MockContact();
-      var name = contact.name[0];
 
       // Remove the name value
       contact.name[0] = '';
@@ -382,7 +383,6 @@ suite('Utils', function() {
           { givenName: [''], familyName: [''] },
           { givenName: ['Jane'], familyName: ['Doozer'] }
         ]);
-        var name = contacts[0].name[0];
         contacts[0].name[0] = '';
 
         var details = Utils.getContactDetails('346578888888', contacts);
@@ -397,7 +397,6 @@ suite('Utils', function() {
 
       test('number is empty, apply organization name if exist', function() {
         var contact = new MockContact();
-        var name = contact.name[0];
 
         // Remove the name value and add org name
         contact.name[0] = '';
@@ -618,28 +617,49 @@ suite('Utils', function() {
     });
   });
 
-  suite('Utils.compareDialables(a, b)', function() {
-    test('spaces', function() {
+  suite('Utils.probablyMatches(a, b)', function() {
+
+    test('mozPhoneNumberService is null', function() {
+      navigator.mozPhoneNumberService = null;
+
       assert.ok(
-        Utils.compareDialables('888 999 5555', '8889995555')
+        Utils.probablyMatches('888 999 5555', '8889995555')
       );
+
+      navigator.mozPhoneNumberService = nmpns;
     });
 
-    test('non-digit, common chars', function() {
+    test('spaces', function() {
       assert.ok(
-        Utils.compareDialables('(1A)2B 3C', '123')
+        Utils.probablyMatches('888 999 5555', '8889995555')
       );
     });
 
     suite('Varied Cases', function() {
       FixturePhones.forEach(function(fixture) {
-        suite(fixture.name, function() {
+        var title = fixture.title;
+
+        if (!fixture.isTestable) {
+          title += ' (this feature is not really being tested)';
+        }
+
+        suite(title, function() {
           var values = fixture.values;
+
+          if (!fixture.isTestable) {
+            suiteSetup(function() {
+              navigator.mozPhoneNumberService = MockMozPhoneNumberService;
+            });
+
+            suiteTeardown(function() {
+              navigator.mozPhoneNumberService = nmpns;
+            });
+          }
 
           values.forEach(function(value) {
             values.forEach(function(versus) {
-              test(value + ' likely same as ' + versus, function() {
-                assert.ok(Utils.compareDialables(value, versus));
+              test(value + ' probably matches ' + versus, function() {
+                assert.ok(Utils.probablyMatches(value, versus));
               });
             });
           });
@@ -669,6 +689,7 @@ suite('Utils', function() {
       var assetsNeeded = 0;
 
       function loadBlob(filename) {
+        /*jshint validthis: true */
         assetsNeeded++;
 
         var req = new XMLHttpRequest();
@@ -789,7 +810,6 @@ suite('Utils', function() {
   });
 
   suite('Utils.typeFromMimeType', function() {
-    var testIndex;
     var tests = {
       'text/plain': 'text',
       'image/jpeg': 'img',
@@ -824,7 +844,6 @@ suite('Utils', function() {
   });
 
   suite('Utils.params', function() {
-    var testIndex;
     var tests = {
       '?foo=bar&baz=1&quux=null': {foo: 'bar', baz: '1', quux: 'null'}
     };
@@ -1002,7 +1021,6 @@ suite('getDisplayObject', function() {
 
   test('Tel object with NO carrier title and NO type', function() {
     var myTitle = 'My title';
-    var type = 'Mobile';
     var value = 111111;
     var data = Utils.getDisplayObject(myTitle, {
       'value': value
@@ -1016,7 +1034,6 @@ suite('getDisplayObject', function() {
   });
 
   test('Tel object with carrier title and type and NO title', function() {
-    var myTitle = 'My title';
     var type = 'Mobile';
     var carrier = 'Carrier';
     var value = 111111;

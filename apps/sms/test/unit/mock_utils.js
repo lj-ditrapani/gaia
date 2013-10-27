@@ -1,5 +1,8 @@
 'use strict';
 
+/* global Utils */
+/* exported MockUtils */
+
 var MockUtils = {
   // we need that this function does real work, so it's copied from the real
   // Utils.js
@@ -23,6 +26,6 @@ var MockUtils = {
   getResizedImgBlob: Utils.getResizedImgBlob,
   getCarrierTag: Utils.getCarrierTag,
   removeNonDialables: Utils.removeNonDialables,
-  compareDialables: Utils.compareDialables,
+  probablyMatches: Utils.probablyMatches,
   getDisplayObject: Utils.getDisplayObject
 };

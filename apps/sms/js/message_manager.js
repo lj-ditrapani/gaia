@@ -1,6 +1,10 @@
 /* -*- Mode: js; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- /
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 
+/*global ThreadListUI, ThreadUI, Threads, SMIL, MozSmsFilter, Compose,
+         Utils, LinkActionHandler, Contacts */
+/*exported MessageManager */
+
 'use strict';
 
 var MessageManager = {
@@ -54,7 +58,10 @@ var MessageManager = {
       ThreadUI.appendMessage(message);
       ThreadUI.forceScrollViewToBottom();
     }
-    MessageManager.getThreads(ThreadListUI.renderThreads);
+
+    MessageManager.getThreads(function() {
+      ThreadListUI.updateThread(message);
+    });
   },
 
   onMessageFailed: function mm_onMessageFailed(e) {
@@ -94,7 +101,7 @@ var MessageManager = {
     if (threadId === Threads.currentId) {
       //Append message and mark as read
       this.markMessagesRead([message.id], function() {
-        MessageManager.getThreads(ThreadListUI.renderThreads);
+        ThreadListUI.updateThread(message);
       });
       ThreadUI.onMessageReceived(message);
     } else {
@@ -212,6 +219,7 @@ var MessageManager = {
     ThreadUI.cancelEdit();
     ThreadListUI.cancelEdit();
 
+    var self = this;
     switch (window.location.hash) {
       case '#new':
         ThreadUI.inThread = false;
@@ -219,7 +227,6 @@ var MessageManager = {
         break;
       case '#thread-list':
         ThreadUI.inThread = false;
-        var self = this;
         //Keep the  visible button the :last-child
         var editButton = document.getElementById('messages-edit-icon');
         editButton.parentNode.appendChild(editButton);
@@ -230,7 +237,6 @@ var MessageManager = {
         } else {
           // Clear it before sliding.
           ThreadUI.container.textContent = '';
-          var self = this;
           MessageManager.slide('right', function() {
             if (self.activity && self.activity.threadId) {
               window.location.hash = '#thread=' + self.activity.threadId;
@@ -280,7 +286,8 @@ var MessageManager = {
     }
 
   },
-
+  // TODO: Optimize this method. Tracked:
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=929919
   getThreads: function mm_getThreads(callback, extraArg) {
     var cursor = this._mozMobileMessage.getThreads(),
         threads = [];
@@ -400,7 +407,7 @@ var MessageManager = {
       };
 
       request.onerror = function onError(event) {
-        console.log('Error Sending: ' + JSON.stringify(event.target.error));
+        console.error('Error Sending: ' + JSON.stringify(event.target.error));
         onerror && onerror(event.target.error);
 
         requestResult.hasError = true;

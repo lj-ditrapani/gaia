@@ -234,6 +234,32 @@ suite('dialer/handled_call', function() {
     });
   });
 
+  suite('while dialing', function() {
+    var updateKeypadSpy;
+
+    setup(function() {
+      updateKeypadSpy = this.sinon.spy(MockCallsHandler, 'updateKeypadEnabled');
+      mockCall.mChangeState('dialing');
+    });
+
+    test('should check if we can enable the keypad', function() {
+      assert.isTrue(updateKeypadSpy.calledOnce);
+    });
+  });
+
+  suite('while alerting', function() {
+    var updateKeypadSpy;
+
+    setup(function() {
+      updateKeypadSpy = this.sinon.spy(MockCallsHandler, 'updateKeypadEnabled');
+      mockCall.mChangeState('alerting');
+    });
+
+    test('should check if we can enable the keypad', function() {
+      assert.isTrue(updateKeypadSpy.calledOnce);
+    });
+  });
+
   suite('on connect', function() {
     setup(function() {
       mockCall._connect();
@@ -593,14 +619,12 @@ suite('dialer/handled_call', function() {
       test('is voicemail call', function() {
         mockCall = new MockCall('123', 'dialing');
         subject = new HandledCall(mockCall);
-        mockCall._disconnect();
         assert.isTrue(subject.recentsEntry.voicemail);
       });
 
       test('is not voicemail call', function() {
         mockCall = new MockCall('111', 'dialing');
         subject = new HandledCall(mockCall);
-        mockCall._disconnect();
         assert.isFalse(subject.recentsEntry.voicemail);
       });
     });

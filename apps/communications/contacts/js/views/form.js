@@ -369,7 +369,7 @@ contacts.Form = (function() {
       var value = '';
 
       currField[currentElem] =
-      (typeof(defObj) === 'object') ? defObj.toString() : defObj;
+      (defObj && typeof(defObj) === 'object') ? defObj.toString() : defObj;
       value = currField[currentElem] || def;
       if (currentElem === 'type') {
         currField['type_value'] = value;
@@ -430,7 +430,7 @@ contacts.Form = (function() {
 
   var deleteContact = function deleteContact(contact) {
     var deleteSuccess = function deleteSuccess() {
-      if (contacts.Search.isInSearchMode()) {
+      if (contacts.Search && contacts.Search.isInSearchMode()) {
         contacts.Search.invalidateCache();
         contacts.Search.removeContact(contact.id);
       }
@@ -443,7 +443,9 @@ contacts.Form = (function() {
       request = fbContact.remove();
       request.onsuccess = deleteSuccess;
     } else {
-      request = navigator.mozContacts.remove(contact);
+      var theContact = (contact instanceof mozContact) ?
+                       contact : new mozContact(contact);
+      request = navigator.mozContacts.remove(theContact);
       request.onsuccess = deleteSuccess;
     }
 
@@ -453,12 +455,12 @@ contacts.Form = (function() {
   };
 
   var getCurrentPhoto = function cf_getCurrentPhoto() {
-    var photo = [];
+    var photo;
     var isRemoved = thumbAction.classList.contains(REMOVED_CLASS);
     if (!isRemoved) {
       photo = currentPhoto;
     }
-    return photo;
+    return photo; // we return undefined on purpose here
   };
 
   var CATEGORY_WHITE_LIST = ['gmail', 'live'];
@@ -489,8 +491,8 @@ contacts.Form = (function() {
 
     var myContact = {
       id: document.getElementById('contact-form-id').value,
-      additionalName: '',
-      name: ''
+      additionalName: [''],
+      name: ['']
     };
 
     var inputs = {
@@ -509,14 +511,14 @@ contacts.Form = (function() {
       }
     }
 
-    var fields = ['photo', 'category'];
-
     if (currentContact['category']) {
       myContact['category'] = currentContact['category'];
     }
 
-    myContact['photo'] = currentContact['photo'] || [];
-    myContact['photo'][0] = getCurrentPhoto();
+    var currentPhoto = getCurrentPhoto();
+    if (currentPhoto) {
+      myContact['photo'] = [currentPhoto];
+    }
 
     createName(myContact);
 
@@ -563,8 +565,7 @@ contacts.Form = (function() {
       }
 
     } else {
-      contact = new mozContact();
-      contact.init(myContact);
+      contact = new mozContact(myContact);
     }
 
     updateCategoryForImported(contact);
@@ -832,7 +833,7 @@ contacts.Form = (function() {
       contact['tel'] = contact['tel'] || [];
       contact['tel'][i] = {
         value: numberValue,
-        type: typeField,
+        type: [typeField],
         carrier: carrierField
       };
     }
@@ -857,7 +858,7 @@ contacts.Form = (function() {
       contact['email'] = contact['email'] || [];
       contact['email'][i] = {
         value: emailValue,
-        type: typeField
+        type: [typeField]
       };
     }
   };
@@ -893,7 +894,7 @@ contacts.Form = (function() {
         postalCode: postalCode,
         locality: locality,
         countryName: countryName,
-        type: typeField
+        type: [typeField]
       };
     }
   };

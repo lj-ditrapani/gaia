@@ -210,7 +210,11 @@ contacts.Merger = (function() {
       matchingContacts.forEach(function(aMatchingContact) {
         // Only remove those contacts which are already in the DB
         if (aMatchingContact.matchingContact.id) {
-          navigator.mozContacts.remove(aMatchingContact.matchingContact);
+          var contact = aMatchingContact.matchingContact;
+          if (!(contact instanceof mozContact)) {
+            contact = new mozContact(contact);
+          }
+          navigator.mozContacts.remove(contact);
         }
       });
 
@@ -235,7 +239,7 @@ contacts.Merger = (function() {
   function populateEmails(sourceEmails, hash, out) {
     if (Array.isArray(sourceEmails)) {
       sourceEmails.forEach(function(aEmail) {
-        var type = Array.isArray(aEmail.type) ? aEmail.type : [aEmail.type];
+        aEmail.type = Array.isArray(aEmail.type) ? aEmail.type : [aEmail.type];
         aEmail.type[0] = aEmail.type[0] || DEFAULT_EMAIL_TYPE;
         var value = aEmail.value;
         if (value && value.trim()) {

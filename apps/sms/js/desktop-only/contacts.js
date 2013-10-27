@@ -1,3 +1,5 @@
+/*global Utils */
+
 'use strict';
 
 /* ***********************************************************
@@ -26,7 +28,7 @@
       aArray = [aArray];
     }
     return aArray.map(stringOrBust).filter(function(el) {
-      return el != undefined;
+      return el !== undefined;
     });
   }
 
@@ -174,8 +176,14 @@
         if (typeof value !== 'string') {
           value = value.value;
         }
-        if (found[term] = value.toLowerCase()[method](term)) {
+        if ((found[term] = value.toLowerCase()[method](term))) {
           return true;
+        }
+
+        if (field === 'tel') {
+          if (Utils.probablyMatches(value, term)) {
+            return true;
+          }
         }
       }
     }
@@ -392,6 +400,25 @@
 
   ContactsDB.push(
     new Contact({
+      familyName: 'Non-digit',
+      givenName: 'Multiple',
+      tel: [
+        {
+          value: '900-BUY-A-CAR',
+          type: ['Mobile'],
+          carrier: 'Megaphones'
+        },
+        {
+          value: '800-BUY-A-CAR',
+          type: ['Home'],
+          carrier: 'Nynex'
+        }
+      ]
+    })
+  );
+
+  ContactsDB.push(
+    new Contact({
       familyName: 'Taumatawhakatangihangakoauauota',
       givenName: 'Mateapokaiwhenuakitanatahu',
       tel: [
@@ -408,4 +435,4 @@
 
 
 
-}(this));
+}(window));
