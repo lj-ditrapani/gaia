@@ -137,6 +137,10 @@ class GaiaTestOptions(MarionetteTestOptions):
                          type='int',
                          metavar='int',
                          help='checkpoint interval for endurance tests')
+        group.add_option('--sources',
+                         action='store',
+                         dest='sources',
+                         help='location of sources.xml file containing version info')
 
     def parse_args(self, args=None, values=None):
         options, tests = MarionetteTestOptions.parse_args(self)
